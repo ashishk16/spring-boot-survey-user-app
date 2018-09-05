@@ -11,8 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import static junit.framework.TestCase.assertTrue;
@@ -30,8 +32,16 @@ public class SurveyControllerIntegrationTest {
     HttpHeaders headers = new HttpHeaders();
     @Before
     public void before() {
+        headers.add("Authorization", getHeaderValue("user1", "secret1"));
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
     }
+
+    private String getHeaderValue(String username, String password) {
+        String auth = username + ":"+ password;
+        byte[] encodedAuth = Base64.encode(auth.getBytes(Charset.forName("US-ASCII")));
+        return "Basic "+new String(encodedAuth);
+    }
+
     @Test
     public void testRetrieveSurveyQuestion() throws JSONException {
 
